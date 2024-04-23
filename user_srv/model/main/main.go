@@ -1,20 +1,15 @@
 package main
 
 import (
-	"gorm.io/gorm/schema"
-	"log"
-	"os"
-	"time"
+	"crypto/sha512"
+	"fmt"
+	"strings"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-
-	"srvs/user_srv/model"
+	"github.com/anaskhan96/go-password-encoder"
 )
 
 func main() {
-	dsn := "root:123456@tcp(127.0.0.1:3306)/shop_user_srv?charset=utf8mb4&parseTime=True&loc=Local"
+	/*dsn := "root:123456@tcp(127.0.0.1:3306)/shop_user_srv?charset=utf8mb4&parseTime=True&loc=Local"
 
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
@@ -37,5 +32,16 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	_ = db.AutoMigrate(&model.User{})
+	_ = db.AutoMigrate(&model.User{})*/
+
+	// Using custom options
+	options := &password.Options{16, 100, 32, sha512.New}
+	salt, encodedPwd := password.Encode("generic password", options)
+	newPassword := fmt.Sprintf("$pbkdf2-sha512$%s$%s", salt, encodedPwd)
+	fmt.Println(len(newPassword))
+	fmt.Println(newPassword)
+	passwordInfo := strings.Split(newPassword, "$")
+	fmt.Println(passwordInfo)
+	check := password.Verify("generic password", passwordInfo[2], passwordInfo[3], options)
+	fmt.Println(check) // true
 }
