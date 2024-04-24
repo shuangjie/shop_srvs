@@ -151,7 +151,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 	return &empty.Empty{}, nil
 }
 
-func (s *UserServer) CheckPassWord(ctx context.Context, req *proto.CheckPasswordInfo) (*proto.CheckResponse, error) {
+func (s *UserServer) CheckUserPassword(ctx context.Context, req *proto.CheckPasswordInfo) (*proto.CheckResponse, error) {
 	//校验密码
 	option := &password.Options{16, 100, 32, sha512.New}
 	passwordInfo := strings.Split(req.EncryptedPassword, "$")
