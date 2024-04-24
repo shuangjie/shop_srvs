@@ -155,6 +155,6 @@ func (s *UserServer) CheckUserPassword(ctx context.Context, req *proto.CheckPass
 	//校验密码
 	option := &password.Options{16, 100, 32, sha512.New}
 	passwordInfo := strings.Split(req.EncryptedPassword, "$")
-	check := password.Verify("generic password", passwordInfo[2], passwordInfo[3], option)
+	check := password.Verify(req.PassWord, passwordInfo[2], passwordInfo[3], option)
 	return &proto.CheckResponse{Success: check}, nil
 }
