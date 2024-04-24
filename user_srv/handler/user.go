@@ -111,15 +111,12 @@ func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	if result.RowsAffected != 0 {
 		return nil, status.Error(codes.AlreadyExists, "用户已存在")
 	}
-	//if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-	//	return nil, result.Error
-	//}
 
 	user.Mobile = req.Mobile
 	user.NickName = req.NickName
 
 	options := &password.Options{16, 100, 32, sha512.New}
-	salt, encodedPwd := password.Encode("generic password", options)
+	salt, encodedPwd := password.Encode(req.PassWord, options)
 	user.Password = fmt.Sprintf("$pbkdf2-sha512$%s$%s", salt, encodedPwd)
 
 	result = global.DB.Create(&user)
@@ -153,8 +150,8 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 
 func (s *UserServer) CheckUserPassword(ctx context.Context, req *proto.CheckPasswordInfo) (*proto.CheckResponse, error) {
 	//校验密码
-	option := &password.Options{16, 100, 32, sha512.New}
+	options := &password.Options{16, 100, 32, sha512.New}
 	passwordInfo := strings.Split(req.EncryptedPassword, "$")
-	check := password.Verify(req.PassWord, passwordInfo[2], passwordInfo[3], option)
+	check := password.Verify(req.PassWord, passwordInfo[2], passwordInfo[3], options)
 	return &proto.CheckResponse{Success: check}, nil
 }
