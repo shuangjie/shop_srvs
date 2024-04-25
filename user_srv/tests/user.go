@@ -62,6 +62,7 @@ func TestUpdateUser() {
 	for i := 0; i < 10; i++ {
 		rsp, err := userClient.UpdateUser(context.Background(), &proto.UpdateUserInfo{
 			Id:       int32(i + 1),
+			NickName: fmt.Sprintf("nick%d", i),
 			Birthday: uint64(time.Time(time.Now().AddDate(-i, 0, 0)).Unix()),
 		})
 		if err != nil {
