@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
+	"time"
 
 	"srvs/user_srv/proto"
 )
@@ -57,11 +58,25 @@ func TestCreateUser() {
 	}
 }
 
+func TestUpdateUser() {
+	for i := 0; i < 10; i++ {
+		rsp, err := userClient.UpdateUser(context.Background(), &proto.UpdateUserInfo{
+			Id:       int32(i + 1),
+			Birthday: uint64(time.Time(time.Now().AddDate(-i, 0, 0)).Unix()),
+		})
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(rsp)
+	}
+}
+
 func main() {
 	Init()
 
 	//TestCreateUser()
-	TestGetUserList()
+	//TestGetUserList()
+	TestUpdateUser()
 
 	conn.Close()
 }
