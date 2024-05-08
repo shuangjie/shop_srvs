@@ -76,8 +76,8 @@ func main() {
 	Init()
 
 	//TestCreateUser()
-	//TestGetUserList()
-	TestUpdateUser()
+	TestGetUserList()
+	//TestUpdateUser()
 
 	conn.Close()
 }
