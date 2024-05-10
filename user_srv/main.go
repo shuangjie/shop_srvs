@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net"
+	"srvs/user_srv/utils"
 
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
@@ -19,7 +20,7 @@ import (
 
 func main() {
 	IP := flag.String("ip", "0.0.0.0", "ip address")
-	Port := flag.Int("port", 50051, "port")
+	Port := flag.Int("port", 0, "port")
 
 	//初始化
 	initialize.InitLogger()
@@ -29,7 +30,12 @@ func main() {
 	zap.S().Info(global.ServerConfig)
 
 	flag.Parse()
-	zap.S().Info(*IP, *Port)
+	zap.S().Infof("ip:%s,port:%d", *IP, *Port)
+
+	if *Port == 0 {
+		*Port, _ = utils.GetFreePort()
+	}
+	zap.S().Info("port:", *Port)
 
 	server := grpc.NewServer()
 	proto.RegisterUserServer(server, &handler.UserServer{})
@@ -52,7 +58,7 @@ func main() {
 	}
 
 	check := &api.AgentServiceCheck{
-		GRPC:                           fmt.Sprintf("192.168.2.49:50051"),
+		GRPC:                           fmt.Sprintf("192.168.2.49:%d", *Port),
 		Interval:                       "5s",
 		Timeout:                        "3s",
 		DeregisterCriticalServiceAfter: "10s",
