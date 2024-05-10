@@ -4,9 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"net"
-	"srvs/user_srv/utils"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/hashicorp/consul/api"
+	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -16,6 +19,7 @@ import (
 	"srvs/user_srv/handler"
 	"srvs/user_srv/initialize"
 	"srvs/user_srv/proto"
+	"srvs/user_srv/utils"
 )
 
 func main() {
@@ -65,7 +69,8 @@ func main() {
 	}
 
 	registration := new(api.AgentServiceRegistration)
-	registration.ID = global.ServerConfig.Name
+	serverID := fmt.Sprintf("%s", uuid.NewV4())
+	registration.ID = serverID
 	registration.Name = global.ServerConfig.Name
 	registration.Port = *Port
 	registration.Tags = []string{"zeng", "user", "grpc"}
@@ -78,9 +83,21 @@ func main() {
 		panic(err)
 	}
 
-	err = server.Serve(lis)
-	if err != nil {
-		panic("failed to serve: " + err.Error())
+	go func() {
+		err = server.Serve(lis)
+		if err != nil {
+			panic("failed to serve: " + err.Error())
+		}
+	}()
+
+	//优雅退出
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	if err = client.Agent().ServiceDeregister(serverID); err != nil {
+		zap.S().Info("注销失败")
+	} else {
+		zap.S().Info("注销成功")
 	}
 
 }
