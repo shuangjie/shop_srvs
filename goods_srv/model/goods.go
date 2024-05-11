@@ -26,7 +26,7 @@ type GoodsCategoryBrand struct {
 }
 
 func (GoodsCategoryBrand) TableName() string {
-	return "goods_category_brand"
+	return "goodscategorybrand"
 }
 
 // Banner Image 的长度为 200，实际上可能会有问题，可以根据实际情况调整
