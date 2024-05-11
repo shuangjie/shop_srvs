@@ -15,11 +15,11 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	"srvs/user_srv/global"
-	"srvs/user_srv/handler"
-	"srvs/user_srv/initialize"
-	"srvs/user_srv/proto"
-	"srvs/user_srv/utils"
+	"srvs/goods_srv/global"
+	"srvs/goods_srv/handler"
+	"srvs/goods_srv/initialize"
+	"srvs/goods_srv/proto"
+	"srvs/goods_srv/utils"
 )
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 	zap.S().Info("port:", *Port)
 
 	server := grpc.NewServer()
-	proto.RegisterUserServer(server, &handler.UserServer{})
+	proto.RegisterGoodsServer(server, &handler.GoodsServer{})
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
