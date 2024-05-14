@@ -9,7 +9,7 @@ type Category struct {
 	IsTab            bool  `gorm:"type:tinyint;not null;default:0;comment:是否在tab栏显示"`
 }
 
-type Brand struct {
+type Brands struct {
 	BaseModel
 	Name string `gorm:"type:varchar(20);not null;comment:品牌名称"`
 	Logo string `gorm:"type:varchar(200);not null;default:'';comment:品牌logo"`
@@ -22,7 +22,7 @@ type GoodsCategoryBrand struct {
 	Category   *Category
 
 	BrandID int32 `gorm:"type:int;index:idx_category_brand,unique"`
-	Brand   *Brand
+	Brand   *Brands
 }
 
 func (GoodsCategoryBrand) TableName() string {
@@ -43,7 +43,7 @@ type Goods struct {
 	CategoryID int32 `gorm:"type:int;not null"`
 	Category   *Category
 	BrandID    int32 `gorm:"type:int;not null"`
-	Brand      *Brand
+	Brand      *Brands
 
 	OnSale   bool `gorm:"type:tinyint;not null;default:0;comment:是否上架"`
 	ShipFree bool `gorm:"type:tinyint;not null;default:0;comment:是否包邮"`
