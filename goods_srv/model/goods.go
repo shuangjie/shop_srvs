@@ -2,17 +2,18 @@ package model
 
 type Category struct {
 	BaseModel
-	Name             string `gorm:"type:varchar(50);not null;comment:分类名称"`
-	ParentCategoryID int32
-	ParentCategory   *Category
-	Level            int32 `gorm:"type:int;not null;default:1;comment:分类级别"`
-	IsTab            bool  `gorm:"type:tinyint;not null;default:0;comment:是否在tab栏显示"`
+	Name             string      `gorm:"type:varchar(50);not null;comment:分类名称" json:"name"`
+	ParentCategoryID int32       `json:"parent"`
+	ParentCategory   *Category   `json:"-"`
+	SubCategory      []*Category `gorm:"foreignKey:ParentCategoryID" json:"sub_category"`
+	Level            int32       `gorm:"type:int;not null;default:1;comment:分类级别" json:"level"`
+	IsTab            bool        `gorm:"type:tinyint;not null;default:0;comment:是否在tab栏显示" json:"is_tab"`
 }
 
 type Brands struct {
 	BaseModel
-	Name string `gorm:"type:varchar(20);not null;comment:品牌名称"`
-	Logo string `gorm:"type:varchar(200);not null;default:'';comment:品牌logo"`
+	Name string `gorm:"type:varchar(20);not null;comment:品牌名称" json:"name"`
+	Logo string `gorm:"type:varchar(200);not null;default:'';comment:品牌logo" json:"logo"`
 }
 
 // GoodsCategoryBrand 可以用 gorm 的 many2many 多对多关联来自动生成
