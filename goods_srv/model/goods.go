@@ -20,10 +20,10 @@ type Brands struct {
 type GoodsCategoryBrand struct {
 	BaseModel
 	CategoryID int32 `gorm:"type:int;index:idx_category_brand,unique"`
-	Category   *Category
+	Category   Category
 
 	BrandsID int32 `gorm:"type:int;index:idx_category_brand,unique"`
-	Brands   *Brands
+	Brands   Brands
 }
 
 func (GoodsCategoryBrand) TableName() string {
@@ -42,9 +42,9 @@ type Goods struct {
 	BaseModel
 
 	CategoryID int32 `gorm:"type:int;not null"`
-	Category   *Category
+	Category   Category
 	BrandsID   int32 `gorm:"type:int;not null"`
-	Brands     *Brands
+	Brands     Brands
 
 	OnSale   bool `gorm:"type:tinyint;not null;default:0;comment:是否上架"`
 	ShipFree bool `gorm:"type:tinyint;not null;default:0;comment:是否包邮"`
@@ -53,7 +53,7 @@ type Goods struct {
 
 	Name            string   `gorm:"type:varchar(50);not null;comment:商品名称"`
 	GoodsSn         string   `gorm:"type:varchar(50);not null;comment:商品编号"`
-	Clicks          int32    `gorm:"type:int;not null;default:0;comment:点击数"`
+	ClickNum        int32    `gorm:"type:int;not null;default:0;comment:点击数"`
 	SoldNum         int32    `gorm:"type:int;not null;default:0;comment:销售数量"`
 	FavNum          int32    `gorm:"type:int;not null;default:0;comment:收藏数量"`
 	MarketPrice     float32  `gorm:"type:decimal(10,2);not null;default:0.01;comment:市场价"`

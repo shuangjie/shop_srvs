@@ -2,6 +2,7 @@ package main
 
 import (
 	"google.golang.org/grpc"
+
 	"srvs/goods_srv/proto"
 )
 
@@ -28,7 +29,13 @@ func main() {
 
 	//TestGetSubCategories()
 
-	TestGetCategoryBrand()
+	//TestGetCategoryBrand()
+
+	//TestGetGoodsList()
+
+	//TestBatchGetGoods()
+
+	TestGetGoodsDetail()
 
 	conn.Close()
 }
