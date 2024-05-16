@@ -22,8 +22,8 @@ type GoodsCategoryBrand struct {
 	CategoryID int32 `gorm:"type:int;index:idx_category_brand,unique"`
 	Category   *Category
 
-	BrandID int32 `gorm:"type:int;index:idx_category_brand,unique"`
-	Brand   *Brands
+	BrandsID int32 `gorm:"type:int;index:idx_category_brand,unique"`
+	Brands   *Brands
 }
 
 func (GoodsCategoryBrand) TableName() string {
@@ -43,8 +43,8 @@ type Goods struct {
 
 	CategoryID int32 `gorm:"type:int;not null"`
 	Category   *Category
-	BrandID    int32 `gorm:"type:int;not null"`
-	Brand      *Brands
+	BrandsID   int32 `gorm:"type:int;not null"`
+	Brands     *Brands
 
 	OnSale   bool `gorm:"type:tinyint;not null;default:0;comment:是否上架"`
 	ShipFree bool `gorm:"type:tinyint;not null;default:0;comment:是否包邮"`
