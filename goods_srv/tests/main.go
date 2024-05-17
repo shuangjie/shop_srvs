@@ -31,11 +31,11 @@ func main() {
 
 	//TestGetCategoryBrand()
 
-	//TestGetGoodsList()
+	TestGetGoodsList()
 
 	//TestBatchGetGoods()
 
-	TestGetGoodsDetail()
+	//TestGetGoodsDetail()
 
 	conn.Close()
 }

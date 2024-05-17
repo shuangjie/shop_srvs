@@ -39,7 +39,7 @@ func main() {
 	}
 
 	_ = db.AutoMigrate(&model.Category{},
-		&model.Brand{},
+		&model.Brands{},
 		&model.GoodsCategoryBrand{},
 		&model.Banner{},
 		&model.Goods{},

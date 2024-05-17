@@ -33,9 +33,9 @@ func (GoodsCategoryBrand) TableName() string {
 // Banner Image 的长度为 200，实际上可能会有问题，可以根据实际情况调整
 type Banner struct {
 	BaseModel
-	Image string `gorm:"type:varchar(200);not null;comment:图片地址"`
-	Url   string `gorm:"type:varchar(200);not null;comment:跳转链接"`
-	Index int32  `gorm:"type:int;not null;default:1;comment:排序"`
+	Image string `gorm:"type:varchar(200);not null;comment:图片地址" json:"image"`
+	Url   string `gorm:"type:varchar(200);not null;comment:跳转链接" json:"url"`
+	Index int32  `gorm:"type:int;not null;default:1;comment:排序" json:"index"`
 }
 
 type Goods struct {
@@ -59,7 +59,7 @@ type Goods struct {
 	MarketPrice     float32  `gorm:"type:decimal(10,2);not null;default:0.01;comment:市场价"`
 	ShopPrice       float32  `gorm:"type:decimal(10,2);not null;default:0.01;comment:商城价"`
 	GoodsBrief      string   `gorm:"type:varchar(200);not null;default:'';comment:商品简介"`
-	Images          GormList `gorm:"type:varchar(1000);not null;default:'';comment:商品图片"`
-	DescImages      GormList `gorm:"type:varchar(1000);not null;default:'';comment:商品描述图片"`
+	Images          GormList `gorm:"type:text[];not null;default:'';comment:商品图片" json:"images"`
+	DescImages      GormList `gorm:"type:text[];not null;default:'';comment:商品描述图片" json:"desc_images"`
 	GoodsFrontImage string   `gorm:"type:varchar(200);not null;default:'';comment:商品主图"`
 }
