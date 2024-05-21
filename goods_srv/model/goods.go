@@ -59,7 +59,7 @@ type Goods struct {
 	MarketPrice     float32  `gorm:"type:decimal(10,2);not null;default:0.01;comment:市场价"`
 	ShopPrice       float32  `gorm:"type:decimal(10,2);not null;default:0.01;comment:商城价"`
 	GoodsBrief      string   `gorm:"type:varchar(200);not null;default:'';comment:商品简介"`
-	Images          GormList `gorm:"type:text[];not null;default:'';comment:商品图片" json:"images"`
-	DescImages      GormList `gorm:"type:text[];not null;default:'';comment:商品描述图片" json:"desc_images"`
+	Images          GormList `gorm:"type:json;not null;default:'[]';comment:商品图片" json:"images"`
+	DescImages      GormList `gorm:"type:json;not null;default:'[]';comment:商品描述图片" json:"desc_images"`
 	GoodsFrontImage string   `gorm:"type:varchar(200);not null;default:'';comment:商品主图"`
 }

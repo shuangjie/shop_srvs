@@ -11,16 +11,15 @@ import (
 
 type GormList []string
 
-func (g *GormList) Value() (driver.Value, error) {
-	if g == nil {
-		return "[]", nil
-	}
-	return json.Marshal(*g)
+// Value implements the driver.Valuer interface for GormList
+func (g GormList) Value() (driver.Value, error) {
+	return json.Marshal(g)
 }
 
+// Scan implements the sql.Scanner interface for GormList
 func (g *GormList) Scan(value interface{}) error {
 	if value == nil {
-		*g = GormList{}
+		*g = nil
 		return nil
 	}
 	switch v := value.(type) {
@@ -29,7 +28,7 @@ func (g *GormList) Scan(value interface{}) error {
 	case string:
 		return json.Unmarshal([]byte(v), g)
 	default:
-		return fmt.Errorf("unsupported type: %T", value)
+		return fmt.Errorf("cannot sql.Scan() unsupported type %T into GormList", value)
 	}
 }
 
