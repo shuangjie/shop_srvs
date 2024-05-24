@@ -14,12 +14,11 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	"srvs/goods_srv/global"
-	"srvs/goods_srv/handler"
-	"srvs/goods_srv/initialize"
-	"srvs/goods_srv/proto"
-	"srvs/goods_srv/utils"
-	"srvs/goods_srv/utils/register/consul"
+	"srvs/inventory_srv/global"
+	"srvs/inventory_srv/initialize"
+	"srvs/inventory_srv/proto"
+	"srvs/inventory_srv/utils"
+	"srvs/inventory_srv/utils/register/consul"
 )
 
 func main() {
@@ -42,7 +41,7 @@ func main() {
 	zap.S().Info("port:", *Port)
 
 	server := grpc.NewServer()
-	proto.RegisterGoodsServer(server, &handler.GoodsServer{})
+	proto.RegisterInventoryServer(server, &proto.UnimplementedInventoryServer{})
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
@@ -57,9 +56,9 @@ func main() {
 	serviceId := uuid.NewV4().String()
 	err = registerClient.Register(global.ServerConfig.Host, *Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
 	if err != nil {
-		zap.S().Panic("goods_srv注册服务失败", err.Error())
+		zap.S().Panic("inventory_srv注册服务失败", err.Error())
 	}
-	zap.S().Debugf("goods_srv服务启动中..., 端口: %d", *Port)
+	zap.S().Debugf("inventory_srv服务启动中..., 端口: %d", *Port)
 
 	//启动服务
 	go func() {
@@ -74,9 +73,9 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	if err = registerClient.DeRegister(serviceId); err != nil {
-		zap.S().Info("goods_srv注销服务失败", err.Error())
+		zap.S().Info("inventory_srv注销服务失败", err.Error())
 	} else {
-		zap.S().Info("goods_srv服务注销成功")
+		zap.S().Info("inventory_srv服务注销成功")
 	}
 
 }
