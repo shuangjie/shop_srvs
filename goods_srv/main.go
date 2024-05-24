@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/hashicorp/consul/api"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -20,6 +19,7 @@ import (
 	"srvs/goods_srv/initialize"
 	"srvs/goods_srv/proto"
 	"srvs/goods_srv/utils"
+	"srvs/goods_srv/utils/register/consul"
 )
 
 func main() {
@@ -53,36 +53,15 @@ func main() {
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
 	//服务注册
-	cfg := api.DefaultConfig()
-	cfg.Address = fmt.Sprintf("%s:%d", global.ServerConfig.ConsulInfo.Host, global.ServerConfig.ConsulInfo.Port)
-
-	client, err := api.NewClient(cfg)
+	registerClient := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, global.ServerConfig.ConsulInfo.Port)
+	serviceId := uuid.NewV4().String()
+	err = registerClient.Register(global.ServerConfig.Host, *Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
 	if err != nil {
-		panic(err)
+		zap.S().Panic("goods_srv注册服务失败", err.Error())
 	}
+	zap.S().Debugf("goods_srv服务启动中..., 端口: %d", *Port)
 
-	check := &api.AgentServiceCheck{
-		GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port),
-		Interval:                       "5s",
-		Timeout:                        "3s",
-		DeregisterCriticalServiceAfter: "10s",
-	}
-
-	registration := new(api.AgentServiceRegistration)
-	serverID := fmt.Sprintf("%s", uuid.NewV4())
-	registration.ID = serverID
-	registration.Name = global.ServerConfig.Name
-	registration.Port = *Port
-	registration.Tags = global.ServerConfig.Tags
-	registration.Address = global.ServerConfig.Host
-	registration.Check = check
-
-	err = client.Agent().ServiceRegister(registration)
-
-	if err != nil {
-		panic(err)
-	}
-
+	//启动服务
 	go func() {
 		err = server.Serve(lis)
 		if err != nil {
@@ -90,14 +69,14 @@ func main() {
 		}
 	}()
 
-	//优雅退出
+	// 优雅退出
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	if err = client.Agent().ServiceDeregister(serverID); err != nil {
-		zap.S().Info("注销失败")
+	if err = registerClient.DeRegister(serviceId); err != nil {
+		zap.S().Info("goods_srv注销服务失败", err.Error())
 	} else {
-		zap.S().Info("注销成功")
+		zap.S().Info("goods_srv服务注销成功")
 	}
 
 }
