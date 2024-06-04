@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"srvs/inventory_srv/handler"
 	"syscall"
 
 	uuid "github.com/satori/go.uuid"
@@ -41,7 +42,7 @@ func main() {
 	zap.S().Info("port:", *Port)
 
 	server := grpc.NewServer()
-	proto.RegisterInventoryServer(server, &proto.UnimplementedInventoryServer{})
+	proto.RegisterInventoryServer(server, &handler.InventoryServer{})
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
