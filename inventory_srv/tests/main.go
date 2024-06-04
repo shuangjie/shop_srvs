@@ -72,12 +72,13 @@ func main() {
 
 	//TestSetInv(422, 40)
 	//TestInvDetail(422)
-
 	//TestSell()
-	//TestInvDetail(421)
+	//TestReBack()
 
-	TestReBack()
-	//TestInvDetail(421)
+	// 批量生成库存，goodsId范围是420-840
+	for i := 420; i <= 840; i++ {
+		TestSetInv(int32(i), 100)
+	}
 
 	conn.Close()
 }
