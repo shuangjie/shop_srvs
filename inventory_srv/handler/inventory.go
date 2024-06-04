@@ -5,10 +5,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-
 	"srvs/inventory_srv/global"
 	"srvs/inventory_srv/model"
 	"srvs/inventory_srv/proto"
+	"sync"
 )
 
 type InventoryServer struct {
@@ -39,10 +39,14 @@ func (*InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo) 
 	}, nil
 }
 
+// 锁
+var m sync.Mutex
+
 // Sell 扣减库存
 func (c *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	// 开启事务
 	tx := global.DB.Begin()
+	m.Lock()
 	for _, good := range req.GoodsInfo {
 		var inv model.Inventory
 		if result := global.DB.Where(&model.Inventory{Goods: good.GoodsId}).First(&inv); result.RowsAffected == 0 {
@@ -54,11 +58,11 @@ func (c *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 			return nil, status.Errorf(codes.ResourceExhausted, "库存不足")
 		}
 		// 扣减库存
-		// fixme: 这里没有加乐观锁，高并发下会出现超卖问题
 		inv.Stocks -= good.Num
 		tx.Save(&inv)
 	}
 	tx.Commit()
+	m.Unlock()
 	return &emptypb.Empty{}, nil
 }
 
@@ -72,6 +76,7 @@ func (c *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 func (c *InventoryServer) ReBack(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	// 开启事务
 	tx := global.DB.Begin()
+	m.Lock()
 	for _, good := range req.GoodsInfo {
 		var inv model.Inventory
 		if result := global.DB.Where(&model.Inventory{Goods: good.GoodsId}).First(&inv); result.RowsAffected == 0 {
@@ -83,5 +88,6 @@ func (c *InventoryServer) ReBack(ctx context.Context, req *proto.SellInfo) (*emp
 		tx.Save(&inv)
 	}
 	tx.Commit()
+	m.Unlock()
 	return &emptypb.Empty{}, nil
 }

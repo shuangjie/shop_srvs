@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"srvs/inventory_srv/proto"
+	"sync"
 )
 
 var invClient proto.InventoryClient
@@ -41,11 +42,13 @@ func TestInvDetail(goodsId int32) {
 	fmt.Printf("InvDetail goodsId:%d, num:%d\n", resp.GoodsId, resp.Num)
 }
 
-func TestSell() {
+func TestSell(wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	_, err := invClient.Sell(context.Background(), &proto.SellInfo{
 		GoodsInfo: []*proto.GoodsInvInfo{
-			{GoodsId: 421, Num: 10},
-			{GoodsId: 422, Num: 40},
+			{GoodsId: 421, Num: 1},
+			//{GoodsId: 422, Num: 40},
 		},
 	})
 	if err != nil {
@@ -75,10 +78,19 @@ func main() {
 	//TestSell()
 	//TestReBack()
 
-	// 批量生成库存，goodsId范围是420-840
-	for i := 420; i <= 840; i++ {
-		TestSetInv(int32(i), 100)
+	//批量生成库存，goodsId范围是421-840
+	//for i := 421; i <= 840; i++ {
+	//	TestSetInv(int32(i), 100)
+	//}
+
+	// 模拟并发扣减库存
+	var wg sync.WaitGroup
+	//wg.Add(30)
+	for i := 0; i < 80; i++ {
+		wg.Add(1)
+		go TestSell(&wg)
 	}
+	wg.Wait()
 
 	conn.Close()
 }
