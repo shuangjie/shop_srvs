@@ -86,7 +86,7 @@ func main() {
 	// 模拟并发扣减库存
 	var wg sync.WaitGroup
 	//wg.Add(30)
-	for i := 0; i < 80; i++ {
+	for i := 0; i < 79; i++ {
 		wg.Add(1)
 		go TestSell(&wg)
 	}
