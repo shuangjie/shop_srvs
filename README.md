@@ -8,7 +8,7 @@
 
 - [x] **user-srv**： 用户服务
 - [x] **goods-srv**： 商品服务
-- [ ] **inventory-srv**： 库存服务
+- [x] **inventory-srv**： 库存服务
 - [ ] **order-srv**： 订单服务
 - [ ] **payment-srv**： 支付服务
 - [ ] **search-srv**： 搜索服务
