@@ -1,6 +1,7 @@
 package global
 
 import (
+	"github.com/go-redsync/redsync/v4"
 	"log"
 	"os"
 	"time"
@@ -15,6 +16,7 @@ import (
 
 var (
 	DB           *gorm.DB
+	RS           *redsync.Redsync
 	ServerConfig *config.ServerConfig = &config.ServerConfig{}
 	NacosConfig  *config.NacosConfig  = &config.NacosConfig{}
 )
@@ -42,5 +44,4 @@ func init() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-
 }

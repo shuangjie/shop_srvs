@@ -8,6 +8,11 @@ type MysqlConfig struct {
 	Password string `mapstructure:"password" json:"password"`
 }
 
+type RedisConfig struct {
+	Host string `mapstructure:"host" json:"host"`
+	Port int    `mapstructure:"port" json:"port"`
+}
+
 type ConsulConfig struct {
 	Host string `mapstructure:"host" json:"host"`
 	Port int    `mapstructure:"port" json:"port"`
@@ -18,6 +23,7 @@ type ServerConfig struct {
 	Host       string       `mapstructure:"host" json:"host"`
 	Tags       []string     `mapstructure:"tags" json:"tags"`
 	MysqlInfo  MysqlConfig  `mapstructure:"mysql" json:"mysql"`
+	RedisInfo  RedisConfig  `mapstructure:"redis" json:"redis"`
 	ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
 }
 
