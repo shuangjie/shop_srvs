@@ -32,7 +32,7 @@ func InitConfig() {
 		panic(err)
 	}
 
-	if err := v.Unmarshal(global.NacosConfig); err != nil {
+	if err := v.Unmarshal(&global.NacosConfig); err != nil {
 		panic(err)
 	}
 	zap.S().Infof("配置信息: %v", global.NacosConfig)
