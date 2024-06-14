@@ -117,3 +117,43 @@ func (*OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest
 
 	return &rsp, nil
 }
+
+// OrderDetail 获取订单详情
+func (*OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoDetailResponse, error) {
+	var order model.OrderInfo
+	var rsp proto.OrderInfoDetailResponse
+
+	// 如果是后台查询，UserID 为 0，gorm 忽略此条件
+	if result := global.DB.Where(&model.OrderInfo{BaseModel: model.BaseModel{ID: req.Id}, User: req.UserId}).First(&order); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "订单不存在")
+	}
+
+	// 获取订单详情
+	rsp.OrderInfo = &proto.OrderInfoResponse{
+		Id:      order.ID,
+		UserId:  order.User,
+		OrderSn: order.OrderSn,
+		PayType: order.PayType,
+		Status:  order.Status,
+		Total:   order.OrderMount,
+		Address: order.Address,
+		Name:    order.SignerName,
+		Mobile:  order.SignerMobile,
+	}
+
+	// 获取订单商品
+	var orderGoods []model.OrderGoods
+	if result := global.DB.Where(&model.OrderGoods{Order: order.ID}).Find(&orderGoods); result.Error != nil {
+		return nil, result.Error
+	}
+	for _, goods := range orderGoods {
+		rsp.Goods = append(rsp.Goods, &proto.OrderItemResponse{
+			GoodsId:    goods.Goods,
+			GoodsName:  goods.GoodsName,
+			GoodsPrice: goods.GoodsPrice,
+			Nums:       goods.Nums,
+		})
+	}
+
+	return &rsp, nil
+}

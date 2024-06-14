@@ -90,7 +90,7 @@ message OrderItemResponse {
 
 message OrderInfoDetailResponse {
   OrderInfoResponse orderInfo = 1;
-  repeated OrderItemResponse goodsInfo = 2;
+  repeated OrderItemResponse goods = 2;
 }
 
 message OrderStatus {
