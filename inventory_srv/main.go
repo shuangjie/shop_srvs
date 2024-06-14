@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"srvs/inventory_srv/handler"
 	"syscall"
 
 	uuid "github.com/satori/go.uuid"
@@ -16,6 +15,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"srvs/inventory_srv/global"
+	"srvs/inventory_srv/handler"
 	"srvs/inventory_srv/initialize"
 	"srvs/inventory_srv/proto"
 	"srvs/inventory_srv/utils"
@@ -24,7 +24,7 @@ import (
 
 func main() {
 	IP := flag.String("ip", "0.0.0.0", "ip address")
-	Port := flag.Int("port", 50051, "port")
+	Port := flag.Int("port", 50053, "port")
 
 	//初始化
 	initialize.InitLogger()
