@@ -2,6 +2,10 @@ package handler
 
 import (
 	"context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"srvs/goods_srv/global"
 	"srvs/order_srv/model"
@@ -53,4 +57,34 @@ func (*OrderServer) CreateCartItem(ctx context.Context, req *proto.CartItemReque
 	}
 	global.DB.Save(&cart)
 	return &proto.ShopCartInfoResponse{Id: cart.ID}, nil
+}
+
+// UpdateCartItem 更新购物车, 可以更新数量和选中状态
+func (*OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemRequest) (*emptypb.Empty, error) {
+	var cart model.ShoppingCart
+
+	// 判断购物车是否存在
+	if result := global.DB.First(&cart, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "购物车不存在")
+	}
+
+	// 更新购物车
+	cart.Checked = req.Checked
+	if req.Nums > 0 {
+		cart.Nums = req.Nums
+	}
+
+	global.DB.Save(&cart)
+
+	return &emptypb.Empty{}, nil
+}
+
+// DeleteCartItem 删除购物车
+func (*OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemRequest) (*emptypb.Empty, error) {
+	if result := global.DB.Delete(&model.ShoppingCart{}, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "购物车不存在")
+	}
+
+	return &emptypb.Empty{}, nil
+
 }
