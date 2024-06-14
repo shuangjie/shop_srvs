@@ -29,7 +29,7 @@ type OrderInfo struct {
 
 	Address      string `gorm:"type:varchar(100)"`
 	SignerName   string `gorm:"type:varchar(20)"`
-	SingerMobile string `gorm:"type:varchar(11)"`
+	SignerMobile string `gorm:"type:varchar(11)"`
 	Post         string `gorm:"type:varchar(20)"`
 }
 

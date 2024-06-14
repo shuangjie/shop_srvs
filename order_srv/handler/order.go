@@ -88,3 +88,32 @@ func (*OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemReque
 	return &emptypb.Empty{}, nil
 
 }
+
+// OrderList 获取订单列表
+func (*OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest) (*proto.OrderListResponse, error) {
+	var orders []model.OrderInfo
+	var rsp proto.OrderListResponse
+
+	var total int64
+	// 如果是后台查询，UserID 为 0，gorm 忽略此条件
+	global.DB.Where(&model.OrderInfo{User: req.UserId}).Count(&total)
+	rsp.Total = int32(total)
+
+	// 分页
+	global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&orders)
+	for _, order := range orders {
+		rsp.Data = append(rsp.Data, &proto.OrderInfoResponse{
+			Id:      order.ID,
+			UserId:  order.User,
+			OrderSn: order.OrderSn,
+			PayType: order.PayType,
+			Status:  order.Status,
+			Total:   order.OrderMount,
+			Address: order.Address,
+			Name:    order.SignerName,
+			Mobile:  order.SignerMobile,
+		})
+	}
+
+	return &rsp, nil
+}
