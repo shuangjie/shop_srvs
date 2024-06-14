@@ -249,6 +249,15 @@ func (*OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) (*
 	return &proto.OrderInfoResponse{Id: order.ID, OrderSn: order.OrderSn, Total: orderAmount}, tx.Commit().Error
 }
 
+// UpdateOrderStatus 更新订单状态
+func (*OrderServer) UpdateOrderStatus(ctx context.Context, req *proto.OrderStatus) (*emptypb.Empty, error) {
+	if result := global.DB.Model(&model.OrderInfo{}).Where("order_sn = ?", req.OrderSn).Update("status", req.Status); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "订单不存在")
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 // GenerateOrderSn 生成唯一订单号
 func GenerateOrderSn(userId int32) string {
 	// 规则: 年月日时分秒(nano) + 用户ID + 2位随机数
