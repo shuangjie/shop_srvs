@@ -30,6 +30,7 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitDB()
+	initialize.InitRedisCli()
 	initialize.InitRedsync()
 
 	initialize.InitSrvConn()

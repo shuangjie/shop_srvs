@@ -14,6 +14,7 @@ import (
 func InitRedsync() {
 	client := goredislib.NewClient(&goredislib.Options{
 		Addr: fmt.Sprintf("%s:%d", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
+		DB:   9, // db9 -> order_srv
 	})
 	pool := goredis.NewPool(client) // or, pool := redigo.NewPool(...)
 
