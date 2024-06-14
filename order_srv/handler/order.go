@@ -46,9 +46,9 @@ func (*OrderServer) CartItemList(ctx context.Context, req *proto.UserInfo) (*pro
 // CreateCartItem 添加购物车
 func (*OrderServer) CreateCartItem(ctx context.Context, req *proto.CartItemRequest) (*proto.ShopCartInfoResponse, error) {
 	// 1. 判断商品是否存在：
-	//if _, err := global.GoodsSrvClient.GetGoodsDetail(context.Background(), &proto.GoodInfoRequest{Id: req.GoodsId}); err != nil {
-	//	return nil, status.Error(codes.NotFound, "商品不存在")
-	//}
+	if _, err := global.GoodsSrvClient.GetGoodsDetail(context.Background(), &proto.GoodInfoRequest{Id: req.GoodsId}); err != nil {
+		return nil, status.Error(codes.NotFound, "商品不存在")
+	}
 
 	// 2. 判断商品是否存在于购物车： A、不存在则新建 B、存在则合并
 	var cart model.ShoppingCart
@@ -108,7 +108,7 @@ func (*OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest
 	rsp.Total = int32(total)
 
 	// 分页
-	global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&orders)
+	global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Where(&model.OrderInfo{User: req.UserId}).Find(&orders)
 	for _, order := range orders {
 		rsp.Data = append(rsp.Data, &proto.OrderInfoResponse{
 			Id:      order.ID,
@@ -246,7 +246,7 @@ func (*OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) (*
 	}
 
 	// 7. 删除购物车中已购买的商品
-	if result := tx.Where(&model.ShoppingCart{User: req.UserId, Checked: true}).Delete(model.ShoppingCart{}); result.RowsAffected == 0 {
+	if result := tx.Where(&model.ShoppingCart{User: req.UserId, Checked: true}).Delete(&model.ShoppingCart{}); result.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, status.Error(codes.Internal, "创建订单失败")
 	}
@@ -263,8 +263,8 @@ func (*OrderServer) UpdateOrderStatus(ctx context.Context, req *proto.OrderStatu
 	return &emptypb.Empty{}, nil
 }
 
-// GenerateOrderSn 生成唯一订单号
-func GenerateOrderSn(userId int32) string {
+// GenerateOrderSn 生成唯一订单号,但这里的用户id会导致订单号长度不一致
+/*func GenerateOrderSn(userId int32) string {
 	// 规则: 年月日时分秒(nano) + 用户ID + 2位随机数
 	now := time.Now()
 	rand.Seed(uint64(now.UnixNano()))
@@ -273,4 +273,30 @@ func GenerateOrderSn(userId int32) string {
 		userId,
 		rand.Intn(90)+10,
 	)
+}*/
+
+// GenerateOrderSn 生成唯一订单号
+func GenerateOrderSn(userId int32) string {
+	// 规则: 1位订单类型+13位毫秒级别时间戳+2位自增值+2位随机数
+	now := time.Now()
+	rand.Seed(uint64(now.UnixNano()))
+	millisecond := now.UnixNano()
+	orderType := 1
+	orderIndex := GetOrderIndex(int(millisecond), userId)
+	return fmt.Sprintf("%d%d%s%d", orderType, millisecond, orderIndex, rand.Intn(90)+10)
+
+}
+
+// GetOrderIndex 获取订单索引,通过redis的原子性自增操作，获得一毫秒内新增订单的个数预留2位
+func GetOrderIndex(millisecond int, userId int32) string {
+	key := GetOrderIndexKey(millisecond, userId)
+	index := global.RedisCli.Incr(context.Background(), key).Val()
+	if index == 1 {
+		global.RedisCli.Expire(context.Background(), key, time.Second*1)
+	}
+	return fmt.Sprintf("%02d", index)
+}
+
+func GetOrderIndexKey(millisecond int, userId int32) string {
+	return fmt.Sprintf("order:index:user:%d:%d", userId, millisecond)
 }
