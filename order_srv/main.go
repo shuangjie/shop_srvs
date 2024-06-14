@@ -29,6 +29,7 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitDB()
+	initialize.InitSrvConn()
 	initialize.InitRedsync()
 
 	zap.S().Info(global.ServerConfig)
