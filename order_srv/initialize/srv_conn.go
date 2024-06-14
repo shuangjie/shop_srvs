@@ -8,12 +8,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"srvs/order_srv/config"
 	"srvs/order_srv/global"
 	"srvs/order_srv/proto"
 )
 
-/*func InitSrvConn() {
+func InitSrvConn() {
 	consulInfo := global.ServerConfig.ConsulInfo
 	// 初始化商品服务客户端
 	goodsConn, err := grpc.Dial(
@@ -38,9 +37,9 @@ import (
 	}
 
 	global.InventorySrvClient = proto.NewInventoryClient(inventoryConn)
-}*/
+}
 
-func InitSrvConn() {
+/*func InitSrvConn() {
 	consulInfo := global.ServerConfig.ConsulInfo
 
 	// 初始化商品服务客户端
@@ -65,4 +64,4 @@ func createGRPCConn(consulInfo config.ConsulConfig, srvName string) (*grpc.Clien
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
 	)
 	return conn, err
-}
+}*/

@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"srvs/order_srv/global"
+	"srvs/order_srv/handler"
 	"srvs/order_srv/initialize"
 	"srvs/order_srv/proto"
 	"srvs/order_srv/utils"
@@ -29,8 +30,9 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitDB()
-	initialize.InitSrvConn()
 	initialize.InitRedsync()
+
+	initialize.InitSrvConn()
 
 	zap.S().Info(global.ServerConfig)
 
@@ -43,7 +45,7 @@ func main() {
 	zap.S().Info("port:", *Port)
 
 	server := grpc.NewServer()
-	proto.RegisterOrderServer(server, &proto.UnimplementedOrderServer{})
+	proto.RegisterOrderServer(server, &handler.OrderServer{})
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {

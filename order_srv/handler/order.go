@@ -45,7 +45,12 @@ func (*OrderServer) CartItemList(ctx context.Context, req *proto.UserInfo) (*pro
 
 // CreateCartItem 添加购物车
 func (*OrderServer) CreateCartItem(ctx context.Context, req *proto.CartItemRequest) (*proto.ShopCartInfoResponse, error) {
-	// 判断商品是否存在： 1、不存在则新建 2、存在则合并
+	// 1. 判断商品是否存在：
+	//if _, err := global.GoodsSrvClient.GetGoodsDetail(context.Background(), &proto.GoodInfoRequest{Id: req.GoodsId}); err != nil {
+	//	return nil, status.Error(codes.NotFound, "商品不存在")
+	//}
+
+	// 2. 判断商品是否存在于购物车： A、不存在则新建 B、存在则合并
 	var cart model.ShoppingCart
 
 	if result := global.DB.Where(&model.ShoppingCart{User: req.UserId, Goods: req.GoodsId}).First(&cart); result.RowsAffected == 1 {
