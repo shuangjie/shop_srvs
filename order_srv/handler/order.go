@@ -89,7 +89,7 @@ func (*OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemReque
 
 // DeleteCartItem 删除购物车
 func (*OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemRequest) (*emptypb.Empty, error) {
-	if result := global.DB.Delete(&model.ShoppingCart{}, req.Id); result.RowsAffected == 0 {
+	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Delete(&model.ShoppingCart{}); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车不存在")
 	}
 
