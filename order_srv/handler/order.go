@@ -72,7 +72,7 @@ func (*OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemReque
 	var cart model.ShoppingCart
 
 	// 判断购物车是否存在
-	if result := global.DB.First(&cart, req.Id); result.RowsAffected == 0 {
+	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).First(&cart); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车不存在")
 	}
 
