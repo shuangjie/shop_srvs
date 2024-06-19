@@ -72,7 +72,7 @@ func (*OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemReque
 	var cart model.ShoppingCart
 
 	// 判断购物车是否存在
-	if result := global.DB.First(&cart, req.Id); result.RowsAffected == 0 {
+	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).First(&cart); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车不存在")
 	}
 
@@ -89,7 +89,7 @@ func (*OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemReque
 
 // DeleteCartItem 删除购物车
 func (*OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemRequest) (*emptypb.Empty, error) {
-	if result := global.DB.Delete(&model.ShoppingCart{}, req.Id); result.RowsAffected == 0 {
+	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Delete(&model.ShoppingCart{}); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车不存在")
 	}
 
@@ -120,6 +120,8 @@ func (*OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest
 			Address: order.Address,
 			Name:    order.SignerName,
 			Mobile:  order.SignerMobile,
+			AddTime: order.CreatedAt.Format("2006-01-02 15:04:05"),
+			Post:    order.Post,
 		})
 	}
 
@@ -147,6 +149,7 @@ func (*OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*
 		Address: order.Address,
 		Name:    order.SignerName,
 		Mobile:  order.SignerMobile,
+		Post:    order.Post,
 	}
 
 	// 获取订单商品
@@ -159,6 +162,7 @@ func (*OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*
 			GoodsId:    goods.Goods,
 			GoodsName:  goods.GoodsName,
 			GoodsPrice: goods.GoodsPrice,
+			GoodsImage: goods.GoodsImage,
 			Nums:       goods.Nums,
 		})
 	}
