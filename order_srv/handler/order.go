@@ -121,6 +121,7 @@ func (*OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest
 			Name:    order.SignerName,
 			Mobile:  order.SignerMobile,
 			AddTime: order.CreatedAt.Format("2006-01-02 15:04:05"),
+			Post:    order.Post,
 		})
 	}
 
@@ -148,6 +149,7 @@ func (*OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*
 		Address: order.Address,
 		Name:    order.SignerName,
 		Mobile:  order.SignerMobile,
+		Post:    order.Post,
 	}
 
 	// 获取订单商品
@@ -160,6 +162,7 @@ func (*OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*
 			GoodsId:    goods.Goods,
 			GoodsName:  goods.GoodsName,
 			GoodsPrice: goods.GoodsPrice,
+			GoodsImage: goods.GoodsImage,
 			Nums:       goods.Nums,
 		})
 	}
