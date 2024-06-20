@@ -38,6 +38,7 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	_ = db.AutoMigrate(&model.ShoppingCart{}, &model.OrderInfo{}, &model.OrderGoods{})
+	//_ = db.AutoMigrate(&model.ShoppingCart{}, &model.OrderInfo{}, &model.OrderGoods{})
+	_ = db.AutoMigrate(&model.OrderInfo{})
 
 }
