@@ -19,12 +19,12 @@ type OrderInfo struct {
 
 	User    int32  `gorm:"type:int;index"`
 	OrderSn string `gorm:"type:varchar(30);index"`
-	PayType string `gorm:"type:varchar(20) comment 'alipay(支付宝)， wechat(微信)'"`
+	PayType string `gorm:"type:varchar(20) comment 'alipay(支付宝)， wechat(微信)';default:'alipay'"`
 
-	//status大家可以考虑使用iota来做
-	Status     string `gorm:"type:varchar(20)  comment 'PAYING(待支付), TRADE_SUCCESS(成功)， TRADE_SUCCESS(超时关闭), WAIT_BUYER_PAY(交易创建), TRADE_FINISHED(交易结束)'"`
-	TradeNo    string `gorm:"type:varchar(100) comment '交易号'"`
-	OrderMount float32
+	//status可以考虑使用iota来做
+	Status     string     `gorm:"type:varchar(20) comment 'PAYING(待支付), TRADE_SUCCESS(成功)， TRADE_SUCCESS(超时关闭), WAIT_BUYER_PAY(交易创建), TRADE_FINISHED(交易结束)';default:'PAYING'"`
+	TradeNo    string     `gorm:"type:varchar(100) comment '交易号'"`
+	OrderMount float32    `gorm:"type:decimal(10,2) comment '订单金额(元，保留两位小数)'"`
 	PayTime    *time.Time `gorm:"type:datetime"`
 
 	Address      string `gorm:"type:varchar(100)"`
