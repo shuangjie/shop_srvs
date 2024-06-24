@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"srvs/userop_srv/global"
+	"srvs/userop_srv/handler"
 	"srvs/userop_srv/initialize"
 	"srvs/userop_srv/proto"
 	"srvs/userop_srv/utils"
@@ -42,9 +43,10 @@ func main() {
 	zap.S().Info("port:", *Port)
 
 	server := grpc.NewServer()
-	proto.RegisterMessageServer(server, &proto.UnimplementedMessageServer{})
-	proto.RegisterAddressServer(server, &proto.UnimplementedAddressServer{})
-	proto.RegisterUserFavServer(server, &proto.UnimplementedUserFavServer{})
+
+	proto.RegisterMessageServer(server, &handler.UserOpServer{})
+	proto.RegisterAddressServer(server, &handler.UserOpServer{})
+	proto.RegisterUserFavServer(server, &handler.UserOpServer{})
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
 		panic("failed to listen: " + err.Error())
