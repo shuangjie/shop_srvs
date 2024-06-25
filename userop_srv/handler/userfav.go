@@ -44,7 +44,7 @@ func (*UserOpServer) AddUserFav(_ context.Context, req *proto.UserFavRequest) (*
 }
 
 func (*UserOpServer) DeleteUserFav(_ context.Context, req *proto.UserFavRequest) (*emptypb.Empty, error) {
-	if result := global.DB.Unscoped().Where("goods=? and user=?", req.GoodsId, req.UserId).Delete(&model.Address{}); result.RowsAffected == 0 {
+	if result := global.DB.Unscoped().Where("goods=? and user=?", req.GoodsId, req.UserId).Delete(&model.UserFav{}); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "收藏记录不存在")
 	}
 	return &emptypb.Empty{}, nil
@@ -52,7 +52,7 @@ func (*UserOpServer) DeleteUserFav(_ context.Context, req *proto.UserFavRequest)
 
 func (*UserOpServer) GetUserFavDetail(_ context.Context, req *proto.UserFavRequest) (*emptypb.Empty, error) {
 	var userfav model.UserFav
-	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Find(userfav); result.RowsAffected == 0 {
+	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Find(&userfav); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "收藏记录不存在")
 	}
 	return &emptypb.Empty{}, nil
